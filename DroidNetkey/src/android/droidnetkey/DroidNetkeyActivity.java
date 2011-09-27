@@ -11,6 +11,7 @@ import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class DroidNetkeyActivity extends Activity {
     /** Called when the activity is first created. */
@@ -20,11 +21,20 @@ public class DroidNetkeyActivity extends Activity {
 	
 	private SharedPreferences prefs;
 	private SharedPreferences.Editor prefEdit;
-	String username;
+	private String username;
 	private String password;
 	
 	private EditText editUsername;
 	private EditText editPassword;
+	
+	private FirewallAction fw;
+	private boolean fwStatus;
+	
+	private Handler timeoutHandler;
+	public static Handler fwHandler;
+	
+	private Runnable timeout;
+	
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,17 +48,22 @@ public class DroidNetkeyActivity extends Activity {
         editUsername = (EditText) findViewById(R.id.editText1);
         editPassword = (EditText) findViewById(R.id.editText2);
         
-        loadSettings();
-    }
-    
-    public void fwDialogTimeout(long time, final ProgressDialog d){
-        Handler handler = new Handler(); 
-        handler.postDelayed(new Runnable() {           
+        timeout = new Runnable() {           
             public void run() {                
                 d.dismiss();
                 timeoutDialog();
             }
-        }, time); 
+        };
+        
+        timeoutHandler = new Handler(); 
+        fwHandler = new Handler();
+        
+        loadSettings();
+    }
+    
+    public void fwDialogTimeout(long time, final ProgressDialog d){
+        
+        timeoutHandler.postDelayed(timeout, time); 
     }
     
     public void toggleFirewall(View view)
@@ -64,18 +79,23 @@ public class DroidNetkeyActivity extends Activity {
     		st = "Disconnecting...";
     	d = ProgressDialog.show(DroidNetkeyActivity.this, "", 
                 st, true);
-    	fwDialogTimeout(15000, d);
+    	fwDialogTimeout(30000, d);
+    	
+    	fw = new Firewall(getApplicationContext());
+    	fw.connect(this.username, this.password);
     }
     
     public void storeSettings()
     {
+    	this.username = editUsername.getText().toString();
+    	prefEdit.putString("username", username);
     	
-    	prefEdit.putString("username", editUsername.getText().toString());
+    	this.password = editPassword.getText().toString();
     	
     	if(checkBox.isChecked())
     	{
     		try {
-				prefEdit.putString("password", SimpleCrypto.encrypt(Settings.Secure.ANDROID_ID, editPassword.getText().toString()) );
+				prefEdit.putString("password", SimpleCrypto.encrypt(Settings.Secure.ANDROID_ID, password) );
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -90,7 +110,8 @@ public class DroidNetkeyActivity extends Activity {
     
     public void loadSettings()
     {
-    	editUsername.setText(prefs.getString("username", ""));
+    	username = prefs.getString("username", "");
+    	editUsername.setText(username);
     	
     	String pass = prefs.getString("password", "");
     	
@@ -106,6 +127,7 @@ public class DroidNetkeyActivity extends Activity {
 			}
     		checkBox.setChecked(true);
     	}
+    	password = passplain;
     	editPassword.setText(passplain);
     }
     
@@ -116,4 +138,23 @@ public class DroidNetkeyActivity extends Activity {
         error.setMessage("Connection Timeout");
         error.show();
     }
+    
+    public interface FWCallBack
+    {
+    	void FwCallback();
+    }
+    
+    public void FwCallback(){
+        
+        
+		d.dismiss();
+		try {
+			timeoutHandler.removeCallbacks(timeout);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Toast.makeText(DroidNetkeyActivity.this, "Connected!", Toast.LENGTH_SHORT).show();
+	
+}
 }
