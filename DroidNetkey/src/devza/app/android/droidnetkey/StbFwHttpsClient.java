@@ -1,4 +1,4 @@
-package android.droidnetkey;
+package devza.app.android.droidnetkey;
 
 import java.io.InputStream;
 import java.security.KeyStore;
@@ -14,9 +14,6 @@ import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.params.*;
 
 import android.content.Context;
-
-import android.content.pm.PackageManager;
-
 
 public class StbFwHttpsClient extends DefaultHttpClient {
 	 

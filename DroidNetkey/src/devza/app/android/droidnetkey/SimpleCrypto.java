@@ -1,4 +1,4 @@
-package android.droidnetkey;
+package devza.app.android.droidnetkey;
 
 
 import java.security.SecureRandom;

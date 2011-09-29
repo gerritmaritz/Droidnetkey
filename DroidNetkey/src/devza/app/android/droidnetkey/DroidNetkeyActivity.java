@@ -1,4 +1,4 @@
-package android.droidnetkey;
+package devza.app.android.droidnetkey;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -7,16 +7,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
-import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.Toast;
 
 public class DroidNetkeyActivity extends Activity {
     /** Called when the activity is first created. */
-	boolean fwstatus = false;
-	ProgressDialog d;
+	public boolean fwstatus = false;
+	
 	CheckBox checkBox;
 	
 	private SharedPreferences prefs;
@@ -28,7 +26,6 @@ public class DroidNetkeyActivity extends Activity {
 	private EditText editPassword;
 	
 	private FirewallAction fw;
-	private boolean fwStatus;
 	
 	private Handler timeoutHandler;
 	public static Handler fwHandler;
@@ -48,12 +45,12 @@ public class DroidNetkeyActivity extends Activity {
         editUsername = (EditText) findViewById(R.id.editText1);
         editPassword = (EditText) findViewById(R.id.editText2);
         
-        timeout = new Runnable() {           
+        /*timeout = new Runnable() {           
             public void run() {                
                 d.dismiss();
                 timeoutDialog();
             }
-        };
+        };*/
         
         timeoutHandler = new Handler(); 
         fwHandler = new Handler();
@@ -71,18 +68,24 @@ public class DroidNetkeyActivity extends Activity {
     	
     	storeSettings();
     	
-    	String st = "";
+    	String st;
+    	String action;
     	
     	if(!fwstatus)
+    	{
     		st = "Connecting...";
+    		action = "login";
+    	}
     	else
+    	{
     		st = "Disconnecting...";
-    	d = ProgressDialog.show(DroidNetkeyActivity.this, "", 
-                st, true);
-    	fwDialogTimeout(30000, d);
+    		action = "logout";
+    	}
     	
-    	fw = new Firewall(getApplicationContext());
-    	fw.connect(this.username, this.password);
+    	String[] fwparams = {username, password, action};
+    	
+    	fw = new FirewallAction(this, fwstatus);
+    	fw.execute(fwparams);
     }
     
     public void storeSettings()
@@ -139,22 +142,6 @@ public class DroidNetkeyActivity extends Activity {
         error.show();
     }
     
-    public interface FWCallBack
-    {
-    	void FwCallback();
-    }
+   // public static void set
     
-    public void FwCallback(){
-        
-        
-		d.dismiss();
-		try {
-			timeoutHandler.removeCallbacks(timeout);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Toast.makeText(DroidNetkeyActivity.this, "Connected!", Toast.LENGTH_SHORT).show();
-	
-}
 }
