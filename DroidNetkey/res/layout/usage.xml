@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:weightSum="1" android:orientation="vertical">
+    <LinearLayout android:layout_height="wrap_content" android:id="@+id/linearLayout1" android:layout_width="match_parent">
+        <TextView android:id="@+id/textView1" android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1" android:layout_gravity="center_vertical" android:keepScreenOn="true" android:text="Monthly Usage:"></TextView>
+        <TextView android:id="@+id/textView2" android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_gravity="left" android:layout_weight="1" android:layout_width="0dp" android:keepScreenOn="true" android:text="Updating..."></TextView>
+    </LinearLayout>
+    <LinearLayout android:layout_height="wrap_content" android:id="@+id/linearLayout2" android:layout_width="match_parent">
+        <TextView android:id="@+id/textView3" android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1" android:text="Monthly Bill:"></TextView>
+        <TextView android:id="@+id/textView4" android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="0dp" android:layout_weight="1" android:keepScreenOn="true" android:text="Updating..."></TextView>
+    </LinearLayout>
+    <Button android:id="@+id/button1" android:layout_height="wrap_content" android:layout_width="match_parent" android:layout_gravity="top" android:onClick="disconnectFirewall" android:text="Disconnect"></Button>
+
+</LinearLayout>
