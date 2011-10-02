@@ -1,3 +1,21 @@
+/*
+    Droidnetkey - An Inetkey implementation for Android
+    Copyright (C) 2011  Gerrit N. Maritz
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package devza.app.android.droidnetkey;
 
 import java.io.*;
@@ -12,6 +30,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.*;
@@ -20,6 +39,7 @@ import org.apache.http.params.*;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 
 public class FirewallAction extends AsyncTask<String, Void, Integer>{
@@ -35,8 +55,10 @@ public class FirewallAction extends AsyncTask<String, Void, Integer>{
 	private ProgressDialog d;
 	private boolean fwstatus;
 	
-	private final int TIMEOUT = 15000;
+	private final int TIMEOUT = 30000;
 	
+	private final int DISCONNECTED = 2;
+	private final int CONNECTED = 1;
 	private final int SUCCESS = 0;
 	private final int INVALID_CREDENTIALS = -1;
 	private final int TIMED_OUT = -2;
@@ -92,7 +114,8 @@ public class FirewallAction extends AsyncTask<String, Void, Integer>{
 	}
 	
 	@Override
-	protected Integer doInBackground(String... arg0) {
+	protected Integer doInBackground(String... arg0) 
+	{
 		// TODO Auto-generated method stub
 		String username = arg0[0];
 		String password = arg0[1];
@@ -146,7 +169,17 @@ public class FirewallAction extends AsyncTask<String, Void, Integer>{
 			error.setMessage(msg);
 			error.show();
 		}
-		
+		else
+		{
+			if(result == CONNECTED)
+			{
+				Intent usage = new Intent(this.context, UsageActivity.class);
+				this.context.startActivity(usage);
+			} else {
+				Intent main = new Intent(this.context, DroidNetkeyActivity.class);
+				this.context.startActivity(main);
+			}
+		}
 	}
 	
 	private int authenticate(String username, String password)
@@ -202,10 +235,13 @@ public class FirewallAction extends AsyncTask<String, Void, Integer>{
 				return INVALID_CREDENTIALS;
 			}
 			
-		} catch (Exception e) {
+		} catch (ConnectTimeoutException e)
+		{
+			return TIMED_OUT;
+		}catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} 
 		return GENERAL_ERROR;
 	}
 	
@@ -240,7 +276,7 @@ public class FirewallAction extends AsyncTask<String, Void, Integer>{
 		
 		if(matcher.find())
 		{
-			return SUCCESS;
+			return CONNECTED;
 		} 
 		
 		return INVALID_CREDENTIALS;
@@ -277,7 +313,7 @@ public class FirewallAction extends AsyncTask<String, Void, Integer>{
 		
 		if(matcher.find())
 		{
-			return SUCCESS;
+			return DISCONNECTED;
 		} 
 		
 		return INVALID_CREDENTIALS;
