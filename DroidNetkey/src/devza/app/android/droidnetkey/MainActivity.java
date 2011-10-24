@@ -18,22 +18,19 @@
 
 package devza.app.android.droidnetkey;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
+import java.util.Timer;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.Settings;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
-public class DroidNetkeyActivity extends Activity {
+public class MainActivity extends DroidnetkeyActivity {
     /** Called when the activity is first created. */
+	private final int REFRESH_RATE = 300000;
+	
 	public boolean fwstatus = false;
 	
 	CheckBox checkBox;
@@ -56,10 +53,7 @@ public class DroidNetkeyActivity extends Activity {
 	
 	private FirewallAction fw;
 	
-	private Handler timeoutHandler;
-	public static Handler fwHandler;
-	
-	private Runnable timeout;
+	private Timer updateTimer;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,33 +67,37 @@ public class DroidNetkeyActivity extends Activity {
         editUsername = (EditText) findViewById(R.id.editText1);
         editPassword = (EditText) findViewById(R.id.editText2);
         
-        timeoutHandler = new Handler(); 
-        fwHandler = new Handler();
+       /* updateTimer = new Timer("Refresh");
+        update();
+        updateTimer.schedule(new TimerTask(){
+        	public void run(){
+        		update();
+        	}
+        }
+        , 60000); //300000ms = 5min
+*/        
         
         loadSettings();
     }
     
-    public void fwDialogTimeout(long time, final ProgressDialog d){
-        
-        timeoutHandler.postDelayed(timeout, time); 
-    }
+    /*public void update()
+    {
+    	
+    }*/
     
     public void toggleFirewall(View view)
     {
     	
     	storeSettings();
     	
-    	String st;
     	String action;
     	
     	if(!fwstatus)
     	{
-    		st = "Connecting...";
     		action = "login";
     	}
     	else
     	{
-    		st = "Disconnecting...";
     		action = "logout";
     	}
     	
@@ -107,6 +105,11 @@ public class DroidNetkeyActivity extends Activity {
     	
     	fw = new FirewallAction(this, fwstatus);
     	fw.execute(fwparams);
+    }
+    
+    public void showPassword(View view)
+    {
+    	
     }
     
     public void storeSettings()
@@ -152,6 +155,7 @@ public class DroidNetkeyActivity extends Activity {
     		checkBox.setChecked(true);
     	}
     	password = passplain;
+    	//TODO: "show password"
     	editPassword.setText(passplain);
     }
 
@@ -160,35 +164,4 @@ public class DroidNetkeyActivity extends Activity {
 
     	moveTaskToBack (true);
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        return true;
-    }
-    
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-    	AlertDialog popup = new AlertDialog.Builder(this).create();
-    	String msg = "";
-        switch (item.getItemId()) {
-            case R.id.help:     popup.setTitle("Help");
-                                msg = "Inetkey for Android allows you to open the firewall of Stellenbosch University from you mobile device. Simply enter you SU username and password and click Connect. Passwords are encrypted on the device to ensure security.";
-                                break;
-            case R.id.about:    popup.setTitle("About");
-            					msg = "Inetkey for Android Copyright (C) 2011 Gerrit N. Maritz. This program comes with ABSOLUTELY NO WARRANTY. This program is released under the GPLv3 licence. Icon: David Vignoni. Reference Program: Pynetkey, Copyright 2009 Janto Dreijer";
-            					break;
-            case R.id.feedback: popup.setTitle("Feedback");
-            					msg = "Please help me improve this software by sending feedback! Send me an email at 15629368@sun.ac.za";
-                                break;
-        }
-        popup.setMessage(msg);
-        popup.show();
-        return true;
-    }
-    
-    
-   // public static void set
-    
 }

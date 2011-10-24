@@ -23,22 +23,21 @@ import java.util.TimerTask;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Notification;
+/*import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
+import android.content.Intent;*/
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
-public class UsageActivity extends Activity{
+public class UsageActivity extends DroidnetkeyActivity{
 	
-	private NotificationManager mNotificationManager;
+	//private NotificationManager mNotificationManager;
 	
 	private FirewallAction fw;
 	
@@ -89,14 +88,14 @@ public class UsageActivity extends Activity{
     private void update()
     {
     	UsageAction update = new UsageAction(this, (TextView)findViewById(R.id.textView4), (TextView)findViewById(R.id.textView2));
-    	String[] args = {DroidNetkeyActivity.getUsername(), DroidNetkeyActivity.getPassword()};
+    	String[] args = {MainActivity.getUsername(), MainActivity.getPassword()};
 		update.execute(args);
     }
     public void disconnectFirewall(View view)
     {
     	String action = "logout";
     	
-    	String[] fwparams = {DroidNetkeyActivity.getUsername(), DroidNetkeyActivity.getPassword(), action};
+    	String[] fwparams = {MainActivity.getUsername(), MainActivity.getPassword(), action};
     	
     	fw = new FirewallAction(this, true);
     	fw.execute(fwparams);
@@ -106,32 +105,5 @@ public class UsageActivity extends Activity{
     public void onBackPressed() {
 
     	moveTaskToBack (true);
-    }
-    
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        return true;
-    }
-    
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-    	AlertDialog popup = new AlertDialog.Builder(this).create();
-    	String msg = "";
-        switch (item.getItemId()) {
-            case R.id.help:     popup.setTitle("Help");
-                                msg = "Inetkey for Android allows you to open the firewall of Stellenbosch University from you mobile device. Simply enter you SU username and password and click Connect. Passwords are encrypted on the device to ensure security.";
-                                break;
-            case R.id.about:    popup.setTitle("About");
-            					msg = "Inetkey for Android Copyright (C) 2011 Gerrit N. Maritz. This program comes with ABSOLUTELY NO WARRANTY. This program is released under the GPLv3 licence. Icon: David Vignoni. Reference Program: Pynetkey, Copyright 2009 Janto Dreijer";
-            					break;
-            case R.id.feedback: popup.setTitle("Feedback");
-            					msg = "Please help me improve this software by sending feedback! Send me an email at 15629368@sun.ac.za";
-                                break;
-        }
-        popup.setMessage(msg);
-        popup.show();
-        return true;
-    }
+    }  
 }

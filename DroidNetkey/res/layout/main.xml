@@ -10,6 +10,7 @@
     </EditText>
     <TextView android:text="Password:" android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:id="@+id/textView4" android:layout_height="wrap_content"></TextView>
     <EditText android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/editText2" android:inputType="textPassword" android:hint="Password"></EditText>
+    <CheckBox android:text="Show Password" android:layout_width="wrap_content" android:id="@+id/checkBox2" android:layout_height="wrap_content"></CheckBox>
     <CheckBox android:text="Remember Password" android:id="@+id/checkBox1" android:layout_height="wrap_content" android:layout_width="match_parent"></CheckBox>
     <Button android:id="@+id/button1" android:text="Connect" android:layout_width="match_parent" android:layout_height="wrap_content" android:onClick="toggleFirewall"></Button>
 </LinearLayout>

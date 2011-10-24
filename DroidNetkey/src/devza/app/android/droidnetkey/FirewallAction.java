@@ -39,6 +39,7 @@ import org.apache.http.params.*;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 
@@ -156,15 +157,21 @@ public class FirewallAction extends AsyncTask<String, Void, Integer>{
 		{
 			AlertDialog error = new AlertDialog.Builder(this.context).create();
 			error.setTitle("Error");
+			error.setButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface d, int id)
+				{
+					d.cancel();
+				}
+			});
 			
 			String msg;
 			
 			switch(result)
 			{
-				case INVALID_CREDENTIALS: 	msg = "Invallid Username or Password"; 	break;
-				case TIMED_OUT:				msg = "Operation Timed Out";			break;
-				case GENERAL_ERROR:			msg = "General Error";					break;
-				default: 					msg = "General Error";					break;
+				case INVALID_CREDENTIALS: 	msg = "Invalid Username or Password"; 	break;
+				case TIMED_OUT:				msg = "Operation Timed Out. Is your device connected to the mobile network?";			break;
+				case GENERAL_ERROR:			msg = "General Error.\n Please send some more information about this error to 15629368@sun.ac.za";					break;
+				default: 					msg = "General Error.\n Please send some more information about this error to 15629368@sun.ac.za";					break;
 			}
 			error.setMessage(msg);
 			error.show();
@@ -176,7 +183,7 @@ public class FirewallAction extends AsyncTask<String, Void, Integer>{
 				Intent usage = new Intent(this.context, UsageActivity.class);
 				this.context.startActivity(usage);
 			} else {
-				Intent main = new Intent(this.context, DroidNetkeyActivity.class);
+				Intent main = new Intent(this.context, MainActivity.class);
 				this.context.startActivity(main);
 			}
 		}

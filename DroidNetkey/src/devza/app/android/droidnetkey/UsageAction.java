@@ -51,7 +51,6 @@ import org.apache.http.params.HttpProtocolParams;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.view.View;
 import android.widget.TextView;
 
 public class UsageAction extends AsyncTask<String, Void, String[]>{
@@ -73,7 +72,7 @@ public class UsageAction extends AsyncTask<String, Void, String[]>{
 	
 	HttpClient client;
 	
-	public UsageAction(Context context,TextView cost, TextView usage)
+	public UsageAction(Context context,TextView usage, TextView cost)
 	{
 		this.context = context;
 		this.cost = cost;
@@ -186,7 +185,7 @@ public class UsageAction extends AsyncTask<String, Void, String[]>{
 	@Override
 	protected void onPostExecute(String[] arg0)
 	{
-		cost.setText(arg0[1]+" MB");
-		usage.setText("R "+arg0[0]);
+		cost.setText(arg0[0]+" MB");
+		usage.setText("R "+arg0[1]);
 			}
 }
