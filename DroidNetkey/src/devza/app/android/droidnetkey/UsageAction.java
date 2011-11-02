@@ -185,7 +185,11 @@ public class UsageAction extends AsyncTask<String, Void, String[]>{
 	@Override
 	protected void onPostExecute(String[] arg0)
 	{
-		cost.setText(arg0[0]+" MB");
-		usage.setText("R "+arg0[1]);
-			}
+		//TODO: Nullpointer exceptions here: check args.
+		if(arg0 != null)
+		{
+			cost.setText(arg0[0]+" MB");
+			usage.setText("R "+arg0[1]);
+		}
+	}
 }

@@ -1,16 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:weightSum="1">
-    <TextView android:text="Username:" android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:id="@+id/textView2" android:layout_height="wrap_content"></TextView>
-    <EditText android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/editText1" android:hint="Username">
-        <requestFocus></requestFocus>
-    </EditText>
-    <TextView android:text="Password:" android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:id="@+id/textView4" android:layout_height="wrap_content"></TextView>
-    <EditText android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/editText2" android:inputType="textPassword" android:hint="Password"></EditText>
-    <CheckBox android:text="Show Password" android:layout_width="wrap_content" android:id="@+id/checkBox2" android:layout_height="wrap_content"></CheckBox>
-    <CheckBox android:text="Remember Password" android:id="@+id/checkBox1" android:layout_height="wrap_content" android:layout_width="match_parent"></CheckBox>
-    <Button android:id="@+id/button1" android:text="Connect" android:layout_width="match_parent" android:layout_height="wrap_content" android:onClick="toggleFirewall"></Button>
-</LinearLayout>
+    android:layout_height="fill_parent" >
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:weightSum="1" >
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Username:"
+            android:textAppearance="?android:attr/textAppearanceMedium" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/editText1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Username" />
+
+        <EditText
+            android:id="@+id/editText2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            android:inputType="textPassword" >
+        </EditText>
+
+        <CheckBox
+            android:id="@+id/checkBox1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Remember Password" >
+        </CheckBox>
+
+        <Button
+            android:id="@+id/button1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="toggleFirewall"
+            android:text="Connect" >
+        </Button>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:clickable="true"
+        android:onClick="showMenu" >
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="122dp"
+            android:src="@drawable/triangle" />
+    </RelativeLayout>
+
+</RelativeLayout>

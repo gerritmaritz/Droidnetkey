@@ -18,14 +18,24 @@
 
 package devza.app.android.droidnetkey;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Timer;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Toast;
+import android.net.ConnectivityManager;
+import android.content.Intent;
+
 
 public class MainActivity extends DroidnetkeyActivity {
     /** Called when the activity is first created. */
@@ -52,8 +62,10 @@ public class MainActivity extends DroidnetkeyActivity {
 	private EditText editPassword;
 	
 	private FirewallAction fw;
-	
+		
 	private Timer updateTimer;
+	
+	private ConnectionService s;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -67,6 +79,9 @@ public class MainActivity extends DroidnetkeyActivity {
         editUsername = (EditText) findViewById(R.id.editText1);
         editPassword = (EditText) findViewById(R.id.editText2);
         
+       bindService(new Intent(this, ConnectionService.class), mConnection,
+				Context.BIND_AUTO_CREATE);
+        
        /* updateTimer = new Timer("Refresh");
         update();
         updateTimer.schedule(new TimerTask(){
@@ -75,7 +90,7 @@ public class MainActivity extends DroidnetkeyActivity {
         	}
         }
         , 60000); //300000ms = 5min
-*/        
+*/
         
         loadSettings();
     }
@@ -87,25 +102,74 @@ public class MainActivity extends DroidnetkeyActivity {
     
     public void toggleFirewall(View view)
     {
+    	username = editUsername.getText().toString();
+    	password = editPassword.getText().toString();
     	
-    	storeSettings();
-    	
-    	String action;
-    	
-    	if(!fwstatus)
+    	if(username.length() == 0 || password.length() == 0)
     	{
-    		action = "login";
-    	}
-    	else
+    		Toast.makeText(this, "Please enter a valid username and password", Toast.LENGTH_SHORT).show();
+    	} else
     	{
-    		action = "logout";
+    		
+	    	storeSettings();
+	    	
+	    	String action;
+	    	
+	    	if(!fwstatus)
+	    	{
+	    		action = "login";
+	    	}
+	    	else
+	    	{
+	    		action = "logout";
+	    	}
+	    	
+	    	s.showNotification();
+	    	
+	    	String[] fwparams = {username, password, action};
+	    	
+	    	fw = new FirewallAction(this, fwstatus);
+	    	fw.execute(fwparams);
     	}
-    	
-    	String[] fwparams = {username, password, action};
-    	
-    	fw = new FirewallAction(this, fwstatus);
-    	fw.execute(fwparams);
     }
+    
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+		public void onServiceConnected(ComponentName className, IBinder binder) {
+			s = ((ConnectionService.MyBinder) binder).getService();
+			Toast.makeText(MainActivity.this, "Connected",
+					Toast.LENGTH_SHORT).show();
+		}
+
+		public void onServiceDisconnected(ComponentName className) {
+			s = null;
+		}
+	};
+    
+    /*public boolean connectionExists()
+    {
+    	ConnectivityManager cm = (ConnectivityManager) this.getSystemService(CONNECTIVITY_SERVICE);
+    	URL url;
+    	try {
+			url = new URL("fw.sun.ac.za");
+		} catch (MalformedURLException e) {}
+    	
+    	//if(cm.requestRouteToHost(ConnectivityManager.TYPE_MOBILE, ipToInt(""));
+    	
+    	return  getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+    }*/
+    
+    /*public static int ipToInt(String addr) {
+        String[] addrArray = addr.split("\\.");
+
+        int num = 0;
+        for (int i=0;i<addrArray.length;i++) {
+            int power = 3-i;
+
+            num += ((Integer.parseInt(addrArray[i])%256 * Math.pow(256,power)));
+        }
+        return num;
+    }*/
     
     public void showPassword(View view)
     {
@@ -114,11 +178,8 @@ public class MainActivity extends DroidnetkeyActivity {
     
     public void storeSettings()
     {
-    	this.username = editUsername.getText().toString();
     	prefEdit.putString("username", username);
-    	
-    	this.password = editPassword.getText().toString();
-    	
+    	    	
     	if(checkBox.isChecked())
     	{
     		try {

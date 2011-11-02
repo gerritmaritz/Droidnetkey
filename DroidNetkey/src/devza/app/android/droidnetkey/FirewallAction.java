@@ -20,6 +20,7 @@ package devza.app.android.droidnetkey;
 
 import java.io.*;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.*;
@@ -61,9 +62,10 @@ public class FirewallAction extends AsyncTask<String, Void, Integer>{
 	private final int DISCONNECTED = 2;
 	private final int CONNECTED = 1;
 	private final int SUCCESS = 0;
-	private final int INVALID_CREDENTIALS = -1;
-	private final int TIMED_OUT = -2;
-	private final int GENERAL_ERROR = -3;
+	private final int GENERAL_ERROR = -1;
+	private final int INVALID_CREDENTIALS = -2;
+	private final int TIMED_OUT = -3;
+	private final int UNKNOWN_HOST = -4;
 	
 	private Context context;
 	
@@ -169,7 +171,8 @@ public class FirewallAction extends AsyncTask<String, Void, Integer>{
 			switch(result)
 			{
 				case INVALID_CREDENTIALS: 	msg = "Invalid Username or Password"; 	break;
-				case TIMED_OUT:				msg = "Operation Timed Out. Is your device connected to the mobile network?";			break;
+				case TIMED_OUT:				msg = "Connection Timed Out. Is your device connected to the mobile network?";			break;
+				case UNKNOWN_HOST:			msg = "Host not Found. Is your device connected to the internet?";			break;
 				case GENERAL_ERROR:			msg = "General Error.\n Please send some more information about this error to 15629368@sun.ac.za";					break;
 				default: 					msg = "General Error.\n Please send some more information about this error to 15629368@sun.ac.za";					break;
 			}
@@ -245,10 +248,14 @@ public class FirewallAction extends AsyncTask<String, Void, Integer>{
 		} catch (ConnectTimeoutException e)
 		{
 			return TIMED_OUT;
-		}catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
+		}catch (UnknownHostException e) {
+			return UNKNOWN_HOST;
+		}catch (SocketTimeoutException e) { 
+			return TIMED_OUT;
+		}catch (Exception e)
+		{
+			
+		}
 		return GENERAL_ERROR;
 	}
 	
