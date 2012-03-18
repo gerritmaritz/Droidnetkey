@@ -18,29 +18,21 @@
 
 package devza.app.android.droidnetkey;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Timer;
-
-import android.content.ComponentName;
+import android.app.AlertDialog;
 import android.content.Context;
-import android.content.ServiceConnection;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.net.ConnectivityManager;
 import android.content.Intent;
 
 
 public class MainActivity extends DroidnetkeyActivity {
-    /** Called when the activity is first created. */
-	private final int REFRESH_RATE = 300000;
-	
+
 	public boolean fwstatus = false;
 	
 	CheckBox checkBox;
@@ -61,12 +53,8 @@ public class MainActivity extends DroidnetkeyActivity {
 	private EditText editUsername;
 	private EditText editPassword;
 	
-	private FirewallAction fw;
-		
-	private Timer updateTimer;
 	
-	private ConnectionService s;
-	
+	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,27 +70,13 @@ public class MainActivity extends DroidnetkeyActivity {
        bindService(new Intent(this, ConnectionService.class), mConnection,
 				Context.BIND_AUTO_CREATE);
         
-       /* updateTimer = new Timer("Refresh");
-        update();
-        updateTimer.schedule(new TimerTask(){
-        	public void run(){
-        		update();
-        	}
-        }
-        , 60000); //300000ms = 5min
-*/
-        
         loadSettings();
     }
-    
-    /*public void update()
-    {
-    	
-    }*/
     
     public void toggleFirewall(View view)
     {
     	username = editUsername.getText().toString();
+    	
     	password = editPassword.getText().toString();
     	
     	if(username.length() == 0 || password.length() == 0)
@@ -110,66 +84,16 @@ public class MainActivity extends DroidnetkeyActivity {
     		Toast.makeText(this, "Please enter a valid username and password", Toast.LENGTH_SHORT).show();
     	} else
     	{
-    		
 	    	storeSettings();
 	    	
-	    	String action;
+	    	s.fwConnect(this);
 	    	
-	    	if(!fwstatus)
+	    	if(mConnection != null)
 	    	{
-	    		action = "login";
+	    	//	unbindService(mConnection);
 	    	}
-	    	else
-	    	{
-	    		action = "logout";
-	    	}
-	    	
-	    	s.showNotification();
-	    	
-	    	String[] fwparams = {username, password, action};
-	    	
-	    	fw = new FirewallAction(this, fwstatus);
-	    	fw.execute(fwparams);
     	}
     }
-    
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-		public void onServiceConnected(ComponentName className, IBinder binder) {
-			s = ((ConnectionService.MyBinder) binder).getService();
-			Toast.makeText(MainActivity.this, "Connected",
-					Toast.LENGTH_SHORT).show();
-		}
-
-		public void onServiceDisconnected(ComponentName className) {
-			s = null;
-		}
-	};
-    
-    /*public boolean connectionExists()
-    {
-    	ConnectivityManager cm = (ConnectivityManager) this.getSystemService(CONNECTIVITY_SERVICE);
-    	URL url;
-    	try {
-			url = new URL("fw.sun.ac.za");
-		} catch (MalformedURLException e) {}
-    	
-    	//if(cm.requestRouteToHost(ConnectivityManager.TYPE_MOBILE, ipToInt(""));
-    	
-    	return  getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
-    }*/
-    
-    /*public static int ipToInt(String addr) {
-        String[] addrArray = addr.split("\\.");
-
-        int num = 0;
-        for (int i=0;i<addrArray.length;i++) {
-            int power = 3-i;
-
-            num += ((Integer.parseInt(addrArray[i])%256 * Math.pow(256,power)));
-        }
-        return num;
-    }*/
     
     public void showPassword(View view)
     {
@@ -218,11 +142,30 @@ public class MainActivity extends DroidnetkeyActivity {
     	password = passplain;
     	//TODO: "show password"
     	editPassword.setText(passplain);
+    	
+    	boolean firstLaunch = prefs.getBoolean("firstLaunch", true);
+    	
+    	if(firstLaunch)
+    	{
+    		AlertDialog notice = new AlertDialog.Builder(this).create();
+    		notice.setTitle("Important");
+    		notice.setButton("Ok", new DialogInterface.OnClickListener() {
+    			
+    			@Override
+    			public void onClick(DialogInterface dialog, int which) {
+    				dialog.dismiss();
+    				prefEdit.putBoolean("firstLaunch", false);
+    				prefEdit.commit();
+    			}
+    		});
+    		notice.setMessage("This software is not provided or endorsed by the University of Stellenbosch. To use Maties WiFi please register your device at Student IT first.");
+    		notice.show();
+    	}
     }
 
     @Override
     public void onBackPressed() {
-
+    	s.stop();
     	moveTaskToBack (true);
     }
 }

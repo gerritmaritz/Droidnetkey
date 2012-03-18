@@ -21,89 +21,69 @@ package devza.app.android.droidnetkey;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 /*import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;*/
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 public class UsageActivity extends DroidnetkeyActivity{
 	
-	//private NotificationManager mNotificationManager;
-	
-	private FirewallAction fw;
-	
 	private Timer updateTimer;
+	
 	//private static final int HELLO_ID = 1;
 	 /** Called when the activity is first created. */
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.usage);
 
-        updateTimer = new Timer("Test");
+        updateTimer = new Timer("Update Data");
         update();
-        updateTimer.schedule(new TimerTask(){
-        	public void run(){
-        		update();
-        	}
-        }
-        , 60000); //300000ms = 5min
+        startTimer();
         
+        bindService(new Intent(this, ConnectionService.class), mConnection,
+				Context.BIND_AUTO_CREATE);
         
-        /*String ns = this.NOTIFICATION_SERVICE;
-        mNotificationManager = (NotificationManager) getSystemService(ns);
-        
-        int icon = R.drawable.ic_menu_refresh;
-        CharSequence tickerText = "Inetkey Connected";
-        long when = System.currentTimeMillis();
-
-        Notification notification = new Notification(icon, tickerText, when);
-        
-        Context context = getApplicationContext();
-        CharSequence contentTitle = "Inetkey";
-        CharSequence contentText = "Connected";
-        Intent notificationIntent = new Intent(this, UsageActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-
-        notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
-        
-        notification.defaults |= Notification.FLAG_ONGOING_EVENT;
-
-        try {
-			mNotificationManager.notify(HELLO_ID, notification);
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}*/
     }
     
     private void update()
     {
+    	Log.d("DNK", "Updated");
+    	
     	UsageAction update = new UsageAction(this, (TextView)findViewById(R.id.textView4), (TextView)findViewById(R.id.textView2));
     	String[] args = {MainActivity.getUsername(), MainActivity.getPassword()};
 		update.execute(args);
     }
+    
+    public void startTimer()
+	{
+		updateTimer = new Timer("Update Data");
+		updateTimer.schedule(new TimerTask(){
+			public void run(){
+					update();
+			}
+		}
+		, 5*60*1000, 5*60*1000); //6min as per pynetkey
+
+	}
+    
     public void disconnectFirewall(View view)
     {
-    	String action = "logout";
     	
-    	String[] fwparams = {MainActivity.getUsername(), MainActivity.getPassword(), action};
-    	
-    	fw = new FirewallAction(this, true);
-    	fw.execute(fwparams);
+    	updateTimer.cancel();
+    	s.fwDisconnect(this);
+    	unbindService(mConnection);
     }
     
     @Override
     public void onBackPressed() {
-
+    	unbindService(mConnection);
     	moveTaskToBack (true);
     }  
 }

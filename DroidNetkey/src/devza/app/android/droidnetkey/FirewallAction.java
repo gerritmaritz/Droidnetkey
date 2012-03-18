@@ -19,6 +19,7 @@
 package devza.app.android.droidnetkey;
 
 import java.io.*;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -39,10 +40,13 @@ import org.apache.http.params.*;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.AsyncTask;
+import android.os.IBinder;
 
 public class FirewallAction extends AsyncTask<String, Void, Integer>{
 	
@@ -56,6 +60,8 @@ public class FirewallAction extends AsyncTask<String, Void, Integer>{
 	
 	private ProgressDialog d;
 	private boolean fwstatus;
+	protected ConnectionService s;
+	private boolean refresh;
 	
 	private final int TIMEOUT = 30000;
 	
@@ -72,10 +78,11 @@ public class FirewallAction extends AsyncTask<String, Void, Integer>{
 	//Debug:
 	private String resp;	
 	
-	public FirewallAction(Context context, boolean status)
+	public FirewallAction(Context context, boolean status, boolean refresh)
 	{
 		this.context = context;
 		this.fwstatus = status;
+		this.refresh = refresh;
 		
 		client = new StbFwHttpsClient(this.context);
 		
@@ -84,35 +91,52 @@ public class FirewallAction extends AsyncTask<String, Void, Integer>{
 		HttpConnectionParams.setSoTimeout(params, TIMEOUT);
 
 		client.setParams(params);
+		
+		if(!refresh)
+		this.context.bindService(new Intent(this.context, ConnectionService.class), mConnection,
+				Context.BIND_AUTO_CREATE);
 	}
+	
+	protected ServiceConnection mConnection = new ServiceConnection() {
+
+		public void onServiceConnected(ComponentName className, IBinder binder) {
+			s = ((ConnectionService.MyBinder) binder).getService();
+		}
+
+		public void onServiceDisconnected(ComponentName className) {
+			s = null;
+		}
+	};
 	
 	@Override
 	protected void onPreExecute()
 	{
-		
-		String st;
-    	//String action;
-    	
-    	if(!fwstatus)
-    	{
-    		st = "Connecting...";
-    		//action = "login";
-    	}
-    	else
-    	{
-    		st = "Disconnecting...";
-    		//action = "logout";
-    	}
-    	d = new ProgressDialog(this.context);
-    	d.setCancelable(false);
-    	d.setIndeterminate(true);
-    	d.setMessage(st);
-    	
-    	try {
-			d.show();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if(!refresh)
+		{
+			String st;
+	    	//String action;
+			    	
+	    	if(!fwstatus)
+	    	{
+	    		st = "Connecting...";
+	    		//action = "login";
+	    	}
+	    	else
+	    	{
+	    		st = "Disconnecting...";
+	    		//action = "logout";
+	    	}
+	    	d = new ProgressDialog(this.context);
+	    	d.setCancelable(false);
+	    	d.setIndeterminate(true);
+	    	d.setMessage(st);
+	    	
+	    	try {
+				d.show();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -152,42 +176,47 @@ public class FirewallAction extends AsyncTask<String, Void, Integer>{
 		/*INVALID_CREDENTIALS = -1;
 		TIMED_OUT = -2;
 		GENERAL_ERROR = -3;*/
-		
-		d.dismiss();
-		
-		if(result < 0)
+		if(!refresh)
 		{
-			AlertDialog error = new AlertDialog.Builder(this.context).create();
-			error.setTitle("Error");
-			error.setButton("Ok", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface d, int id)
+			d.dismiss();
+			
+			if(result < 0)
+			{
+				AlertDialog error = new AlertDialog.Builder(this.context).create();
+				error.setTitle("Error");
+				error.setButton("Ok", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface d, int id)
+					{
+						d.cancel();
+					}
+				});
+				
+				String msg;
+				
+				switch(result)
 				{
-					d.cancel();
+					case INVALID_CREDENTIALS: 	msg = "Invalid Username or Password"; 	break;
+					case TIMED_OUT:				msg = "Connection Timed Out. Is your device connected to the internet?";			break;
+					case UNKNOWN_HOST:			msg = "Could not connect. Is your device connected to the internet?";			break;
+					case GENERAL_ERROR:			msg = "General Error.\n Please send some more information about this error to 15629368@sun.ac.za";					break;
+					default: 					msg = "General Error.\n Please send some more information about this error to 15629368@sun.ac.za";					break;
 				}
-			});
-			
-			String msg;
-			
-			switch(result)
-			{
-				case INVALID_CREDENTIALS: 	msg = "Invalid Username or Password"; 	break;
-				case TIMED_OUT:				msg = "Connection Timed Out. Is your device connected to the mobile network?";			break;
-				case UNKNOWN_HOST:			msg = "Host not Found. Is your device connected to the internet?";			break;
-				case GENERAL_ERROR:			msg = "General Error.\n Please send some more information about this error to 15629368@sun.ac.za";					break;
-				default: 					msg = "General Error.\n Please send some more information about this error to 15629368@sun.ac.za";					break;
+				error.setMessage(msg);
+				error.show();
 			}
-			error.setMessage(msg);
-			error.show();
-		}
-		else
-		{
-			if(result == CONNECTED)
+			else
 			{
-				Intent usage = new Intent(this.context, UsageActivity.class);
-				this.context.startActivity(usage);
-			} else {
-				Intent main = new Intent(this.context, MainActivity.class);
-				this.context.startActivity(main);
+				if(result == CONNECTED)
+				{
+					Intent usage = new Intent(this.context, UsageActivity.class);
+					this.context.startActivity(usage);
+					this.s.showNotification(true);
+					this.s.startTimer();
+				} else {
+					Intent main = new Intent(this.context, MainActivity.class);
+					this.context.startActivity(main);
+					this.s.showNotification(false);
+				}
 			}
 		}
 	}
@@ -252,9 +281,11 @@ public class FirewallAction extends AsyncTask<String, Void, Integer>{
 			return UNKNOWN_HOST;
 		}catch (SocketTimeoutException e) { 
 			return TIMED_OUT;
+		}catch(SocketException e) {
+			return UNKNOWN_HOST;
 		}catch (Exception e)
 		{
-			
+			return GENERAL_ERROR;
 		}
 		return GENERAL_ERROR;
 	}
