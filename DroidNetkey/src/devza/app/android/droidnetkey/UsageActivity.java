@@ -18,6 +18,8 @@
 
 package devza.app.android.droidnetkey;
 
+import java.text.DecimalFormat;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -26,16 +28,25 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;*/
+import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class UsageActivity extends DroidnetkeyActivity{
 	
 	private Timer updateTimer;
+	private ConnectionService cService = null;
+	
+	
+	private ProgressDialog d;
 	
 	//private static final int HELLO_ID = 1;
 	 /** Called when the activity is first created. */
@@ -43,22 +54,108 @@ public class UsageActivity extends DroidnetkeyActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.usage);
 
-        updateTimer = new Timer("Update Data");
-        update();
-        startTimer();
+        Intent cs = new Intent(this, ConnectionService.class);
         
-        bindService(new Intent(this, ConnectionService.class), mConnection,
-				Context.BIND_AUTO_CREATE);
+        if(!isConServiceRunning())
+        {
+        	startService(cs);
+        }
+        
+        if(cService == null)
+        {
+        	bindService(cs, s, Context.BIND_AUTO_CREATE);
+        }
+        //updateTimer = new Timer("Update Data");
+        //update();
+        startTimer();
         
     }
     
+    private ServiceConnection s = new ServiceConnection() {
+        @SuppressWarnings("unchecked")
+		public void onServiceConnected(ComponentName className, IBinder service) {
+              cService = ((LocalBinder<ConnectionService>) service).getService();
+     
+          }
+
+          public void onServiceDisconnected(ComponentName className) {
+              // As our service is in the same process, this should never be called
+          }
+     }; 
+     
+     private InetCallback listener = new InetCallback() {
+		
+		@Override
+		public void statusCallback(int code, String message) {
+			// TODO Auto-generated method stub
+			Log.d("DNK", "Code: "+code+" : "+message);
+			d.dismiss();
+			
+			switch(code)
+			{
+				case 0:
+					startActivity(new Intent(UsageActivity.this, MainActivity.class));
+					break;
+				default:
+					runOnUiThread(new Runnable() {
+						
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							Toast.makeText(UsageActivity.this, "An error has occured, please try again.", Toast.LENGTH_SHORT).show();
+						}
+					});
+					break;
+			}
+			
+		}
+	};
+    
     private void update()
     {
-    	Log.d("DNK", "Updated");
     	
-    	UsageAction update = new UsageAction(this, (TextView)findViewById(R.id.textView4), (TextView)findViewById(R.id.textView2));
-    	String[] args = {MainActivity.getUsername(), MainActivity.getPassword()};
-		update.execute(args);
+    	runOnUiThread(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				Map<String, Object> api_stat = cService.getApi_stat();
+				
+				DecimalFormat df = new DecimalFormat("0.00");
+				
+				//Log.d("test", df.format(((Number)api_stat.get("monthusage")).doubleValue()));
+				
+				((TextView)findViewById(R.id.textMonthUsage)).setText("R "+df.format(((Number)api_stat.get("monthusage")).doubleValue()));
+		    	((TextView)findViewById(R.id.textYearUsage)).setText("R "+df.format(((Number)api_stat.get("yearusage")).doubleValue()));
+		    	
+		    	int inetstate = ((Number)api_stat.get("inetstate")).intValue();
+		    	String inetstatemsg = "";
+		    	switch(inetstate)
+		    	{
+		    		case 0:
+		    			inetstatemsg = "Internet OK";
+		    			((TextView)findViewById(R.id.textInetState)).setTextColor(0xFF669900);
+		    			break;
+		    		case 1:
+		    			inetstatemsg = "No International Connection";
+		    			((TextView)findViewById(R.id.textInetState)).setTextColor(0xFFCC0000);
+		    			break;
+		    		case 2:
+		    			inetstatemsg = "No Internet Connection";
+		    			((TextView)findViewById(R.id.textInetState)).setTextColor(0xFFCC0000);
+		    			break;
+		    	}
+		    	
+		    	((TextView)findViewById(R.id.textInetState)).setText(inetstatemsg);
+		    	((TextView)findViewById(R.id.textInetMessage)).setText((String)api_stat.get("inetmsg"));
+			}
+		});
+    	
+    	
+    	//UsageAction update = new UsageAction(this, (TextView)findViewById(R.id.textView4), (TextView)findViewById(R.id.textView2));
+    	//String[] args = {MainActivity.getUsername(), MainActivity.getPassword()};
+    	
+    	Log.d("DNK", "Updated");
     }
     
     public void startTimer()
@@ -69,21 +166,36 @@ public class UsageActivity extends DroidnetkeyActivity{
 					update();
 			}
 		}
-		, 5*60*1000, 5*60*1000); //6min as per pynetkey
+		, 0, 1*60*1000);
 
 	}
     
     public void disconnectFirewall(View view)
     {
+    	d = new ProgressDialog(this);
+    	d.setCancelable(true);
+    	d.setIndeterminate(true);
+    	d.setMessage("Disconnecting...");
     	
+    	try {
+			d.show();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	updateTimer.cancel();
-    	s.fwDisconnect(this);
-    	unbindService(mConnection);
+    	cService.fwDisconnect(listener);
     }
     
     @Override
     public void onBackPressed() {
-    	unbindService(mConnection);
+    	//unbindService(mConnection);
     	moveTaskToBack (true);
-    }  
+    } 
+    
+    @Override
+    public void onDestroy()
+    {
+    	updateTimer.cancel();
+    }
 }

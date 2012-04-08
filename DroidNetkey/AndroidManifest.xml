@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="devza.app.android.droidnetkey" android:versionCode="6" android:versionName="0.4b">
-    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="8"/>
+      package="devza.app.android.droidnetkey" android:versionCode="7" android:versionName="1.0.0">
+    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="10"/>
 <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 <uses-permission android:name="android.permission.INTERNET" /> 
     <application android:allowClearUserData="true" android:debuggable="false" android:label="@string/app_name" android:icon="@drawable/icon" android:testOnly="false" android:enabled="true" android:allowBackup="true">
@@ -20,6 +20,6 @@
 
             </intent-filter>
         </activity>
-        <service android:name="ConnectionService"></service>
+        <service android:name=".ConnectionService"></service>
     </application>
 </manifest>

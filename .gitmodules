@@ -1,0 +1,6 @@
+[submodule "xmlrpc"]
+	path = xmlrpc
+	url = https://github.com/timroes/aXMLRPC.git
+[submodule "DroidNetkey/libs/xmlrpc"]
+	path = DroidNetkey/libs/xmlrpc
+	url = https://github.com/timroes/aXMLRPC.git
