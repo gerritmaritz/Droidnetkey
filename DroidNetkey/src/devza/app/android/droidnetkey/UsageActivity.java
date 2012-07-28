@@ -119,6 +119,10 @@ public class UsageActivity extends DroidnetkeyActivity{
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
+				if(cService == null)
+				{
+					Log.d("DNK","Service tried update without service being bound" );
+				}
 				Map<String, Object> api_stat = cService.getApi_stat();
 				
 				DecimalFormat df = new DecimalFormat("0.00");
@@ -155,7 +159,7 @@ public class UsageActivity extends DroidnetkeyActivity{
     	//UsageAction update = new UsageAction(this, (TextView)findViewById(R.id.textView4), (TextView)findViewById(R.id.textView2));
     	//String[] args = {MainActivity.getUsername(), MainActivity.getPassword()};
     	
-    	Log.d("DNK", "Updated");
+    	Log.d("DNK", "Updated from Service");
     }
     
     public void startTimer()
@@ -190,12 +194,16 @@ public class UsageActivity extends DroidnetkeyActivity{
     @Override
     public void onBackPressed() {
     	//unbindService(mConnection);
+    	updateTimer.cancel();
+    	unbindService(s);
     	moveTaskToBack (true);
+    	//this.finish();
     } 
     
     @Override
     public void onDestroy()
     {
+    	unbindService(s);
     	updateTimer.cancel();
     }
 }

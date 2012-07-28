@@ -90,17 +90,19 @@ public class ConnectionService extends Service {
 	public void onCreate(){
 		super.onCreate();
 		
-		boolean isDebuggable = (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE));
+		//boolean isDebuggable = (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE));
+		boolean isDebuggable = false;
 		
 		if(isDebuggable)
 		{
 			try {
-				API_URL = new URL("https://maties2.sun.ac.za/RTAD4-RPC3");
+				API_URL = new URL("https://rtaddev.sun.ac.za/RTAD4-RPC3");
 			} catch (MalformedURLException e) {}
+			
 		}else
 		{
 			try {
-				API_URL = new URL("https://rtaddev.sun.ac.za/RTAD4-RPC3");
+				API_URL = new URL("https://maties2.sun.ac.za/RTAD4-RPC3");
 			} catch (MalformedURLException e) {}
 		}
 
@@ -131,6 +133,12 @@ public class ConnectionService extends Service {
 			    	outCall.statusCallback(-1, error.getMessage());
 			    }
 		};
+		Log.d("IWS", "Service Created");
+	}
+	
+	@Override
+	public void onDestroy(){
+		Log.d("IWS", "Service Destroyed");
 	}
 	
 	@Override
@@ -182,14 +190,15 @@ public class ConnectionService extends Service {
 	{
 		outCall = callback;
 
-			Map<Object, Object> mp = new HashMap<Object, Object>();
-		    mp.put("requser", TextUtils.htmlEncode(username));
-		    mp.put("reqpwd", TextUtils.htmlEncode(password));
-		    mp.put("platform", "any");
+		Map<Object, Object> mp = new HashMap<Object, Object>();
+		mp.put("requser", TextUtils.htmlEncode(username));
+		mp.put("reqpwd", TextUtils.htmlEncode(password));
+		//Log.d("DNK", TextUtils.htmlEncode(password));
+		mp.put("platform", "any");
 		    
-			this.open_id = this.client.callAsync(listener,"rtad4inetkey_api_open", mp);
+		this.open_id = this.client.callAsync(listener,"rtad4inetkey_api_open", mp);
 			
-			Log.d("IWS", "Open Executed");
+		Log.d("IWS", "Open Executed");
 	}
 	
 	public void fwDisconnect(InetCallback callback)
@@ -218,14 +227,14 @@ public class ConnectionService extends Service {
 	    
 		this.refresh_id = this.client.callAsync(listener,"rtad4inetkey_api_renew", mp);
 		
-		Log.d("IWS", "Open Executed");
+		Log.d("IWS", "Update Executed");
 		
     }
 	
 	public void stop()
 	{
 		this.stopSelf();
-		Log.d("DNK", "Service: Service Stopped");
+		Log.d("IWS", "Service: Service Stopped");
 	}
 	
 	public void startUpdateTimer()
@@ -237,7 +246,7 @@ public class ConnectionService extends Service {
 			}
 		}
 		, 10*60*1000, 10*60*1000); //10min as per API spec
-		Log.d("DNK", "Service: FW Timer Started");
+		Log.d("IWS", "Service: FW Timer Started");
 
 	}
 	
