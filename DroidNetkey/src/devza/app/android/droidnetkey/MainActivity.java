@@ -120,8 +120,8 @@ public class MainActivity extends DroidnetkeyActivity {
 							
 							switch(code)
 							{
-								case INVALID_CREDENTIALS: 	msg = "Invalid Username or Password"; 	break;
-								default: 					msg = "Connection Error.\nEnsure your device is connected to a Stellenbosch University WiFi network";					break;
+								case INVALID_CREDENTIALS: 	msg = "Invalid Username or Password"+message; break;
+								default: 					msg = "Connection Error.\n"+message; break;
 							}
 							
 							error.setMessage(msg);

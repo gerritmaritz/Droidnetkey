@@ -193,8 +193,8 @@ public class ConnectionService extends Service {
 		Map<Object, Object> mp = new HashMap<Object, Object>();
 		mp.put("requser", TextUtils.htmlEncode(username));
 		mp.put("reqpwd", TextUtils.htmlEncode(password));
-		//Log.d("DNK", TextUtils.htmlEncode(password));
 		mp.put("platform", "any");
+		mp.put("keepalive", 0);
 		    
 		this.open_id = this.client.callAsync(listener,"rtad4inetkey_api_open", mp);
 			
@@ -209,7 +209,8 @@ public class ConnectionService extends Service {
 		
 		Map<Object, Object> mp = new HashMap<Object, Object>();
 	    mp.put("requser", TextUtils.htmlEncode(username));
-	    mp.put("reqpwd", "");
+	    mp.put("reqpwd", TextUtils.htmlEncode(password));
+		mp.put("platform", "any");
 	    
 		this.close_id = this.client.callAsync(listener,"rtad4inetkey_api_close", mp);
 		
@@ -221,9 +222,10 @@ public class ConnectionService extends Service {
 	private void fwUpdate()
     {
 		Map<Object, Object> mp = new HashMap<Object, Object>();
-	    mp.put("requser", TextUtils.htmlEncode(username));
-	    mp.put("reqpwd", "");
-	    mp.put("platform", "any");
+		mp.put("requser", TextUtils.htmlEncode(username));
+		mp.put("reqpwd", TextUtils.htmlEncode(password));
+		mp.put("platform", "any");
+		mp.put("keepalive", 0);
 	    
 		this.refresh_id = this.client.callAsync(listener,"rtad4inetkey_api_renew", mp);
 		

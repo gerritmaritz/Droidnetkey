@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="devza.app.android.droidnetkey" android:versionCode="8" android:versionName="1.0.1">
+      package="devza.app.android.droidnetkey" android:versionCode="9" android:versionName="1.0.2">
     <uses-sdk android:minSdkVersion="5" android:targetSdkVersion="10"/>
 <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 <uses-permission android:name="android.permission.INTERNET" /> 

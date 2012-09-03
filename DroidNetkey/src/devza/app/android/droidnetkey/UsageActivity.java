@@ -203,6 +203,7 @@ public class UsageActivity extends DroidnetkeyActivity{
     @Override
     public void onDestroy()
     {
+    	super.onDestroy();
     	unbindService(s);
     	updateTimer.cancel();
     }

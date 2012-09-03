@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="devza/app/android/droidnetkey/FirewallAction.java|devza/app/android/droidnetkey/UsageAction.java|devza/app/android/droidnetkey/StbFwHttpsClient.java|devza/app/android/droidnetkey/IWS.java" kind="src" path="src"/>
+	<classpathentry kind="src" path="libs/xmlrpc/src/main/java"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry kind="src" path="libs/xmlrpc/src"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="output" path="bin/classes"/>
