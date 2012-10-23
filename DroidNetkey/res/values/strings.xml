@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, DroidNetkeyActivity!</string>
     <string name="app_name">Inetkey</string>
+    <string name="un_u">Username:</string>
+    <string name="pw_u">Password:</string>
+    <string name="default_updating">Updating&#8230;</string>
+    <string name="acc_state">Account State:</string>
+    <string name="mon_usage">Month:</string>
+    <string name="year_usage">Year:</string>
+    <string name="istate">Internet State:</string>
+    <string name="discon">Disconnect</string>
+    
+    <string name="rpass">Remember Password</string>
+    <string name="conn">Connect</string>
+    <string name="net_cred">Network Credentials</string>
+    <string name="un">Username</string>
+    <string name="pw">Password</string>
+    <string name="acstat">Account Information</string>
 </resources>

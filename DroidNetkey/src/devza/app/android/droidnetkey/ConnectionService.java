@@ -113,13 +113,15 @@ public class ConnectionService extends Service {
 			e.printStackTrace();
 		}
 		
-		this.client = new XMLRPCClient(API_URL,"Inetkey/Android "+versionCode);
+		this.client = new XMLRPCClient(API_URL,"Inetkey/Android "+versionCode, XMLRPCClient.FLAGS_8BYTE_INT);
 		 
 		 this.listener = new XMLRPCCallback() {
+				@SuppressWarnings("unchecked")
 				public void onResponse(long id, Object result) {
 			        // Handling the servers response
 					
 					api_stat = (Map<String, Object>)result;
+					api_stat.put("username", username);
 
 					if(id == open_id || id == close_id)
 					{
@@ -127,10 +129,10 @@ public class ConnectionService extends Service {
 					}
 			    }
 			    public void onError(long id, XMLRPCException error) {
-			    	outCall.statusCallback(-1, error.getMessage());
+			    	outCall.statusCallback(error);
 			    }
 			    public void onServerError(long id, XMLRPCServerException error) {
-			    	outCall.statusCallback(-1, error.getMessage());
+			    	outCall.statusCallback(error);
 			    }
 		};
 		Log.d("IWS", "Service Created");
@@ -150,7 +152,7 @@ public class ConnectionService extends Service {
 	{
 		String ns = Context.NOTIFICATION_SERVICE;
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
-		int icon = R.drawable.icon;
+		int icon = R.drawable.logo_statusbar;
 		CharSequence tickerText;
 		CharSequence contentText;
 		long when = System.currentTimeMillis();
@@ -196,7 +198,7 @@ public class ConnectionService extends Service {
 		mp.put("platform", "any");
 		mp.put("keepalive", 0);
 		    
-		this.open_id = this.client.callAsync(listener,"rtad4inetkey_api_open", mp);
+		this.open_id = this.client.callAsync(listener,"rtad4inetkey_api_open2", mp);
 			
 		Log.d("IWS", "Open Executed");
 	}
@@ -212,7 +214,7 @@ public class ConnectionService extends Service {
 	    mp.put("reqpwd", TextUtils.htmlEncode(password));
 		mp.put("platform", "any");
 	    
-		this.close_id = this.client.callAsync(listener,"rtad4inetkey_api_close", mp);
+		this.close_id = this.client.callAsync(listener,"rtad4inetkey_api_close2", mp);
 		
 		Log.d("IWS", "Close Executed");
 		
@@ -227,7 +229,7 @@ public class ConnectionService extends Service {
 		mp.put("platform", "any");
 		mp.put("keepalive", 0);
 	    
-		this.refresh_id = this.client.callAsync(listener,"rtad4inetkey_api_renew", mp);
+		this.refresh_id = this.client.callAsync(listener,"rtad4inetkey_api_open2", mp);
 		
 		Log.d("IWS", "Update Executed");
 		
@@ -254,7 +256,14 @@ public class ConnectionService extends Service {
 	
 	public void stopUpdateTimer()
 	{
-		updateTimer.cancel();
+		if(updateTimer != null){
+			updateTimer.cancel();
+			Log.d("IWS", "Service: FW Timer Stopped");
+		}else{
+			Log.d("IWS", "Service Error: FW Timer Stopped");
+		}
+		
+		
 	}
 
 }

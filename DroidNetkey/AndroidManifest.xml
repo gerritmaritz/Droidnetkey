@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="devza.app.android.droidnetkey" android:versionCode="9" android:versionName="1.0.2">
+      package="devza.app.android.droidnetkey" android:versionCode="14" android:versionName="1.2.2">
     <uses-sdk android:minSdkVersion="5" android:targetSdkVersion="10"/>
 <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+<!-- <uses-feature android:name="android.hardware.wifi" />  -->
 <uses-permission android:name="android.permission.INTERNET" /> 
-    <application android:allowClearUserData="true" android:debuggable="false" android:label="@string/app_name" android:icon="@drawable/icon" android:testOnly="false" android:enabled="true" android:allowBackup="true">
+    <application android:allowClearUserData="true" android:label="@string/app_name" android:icon="@drawable/icon" android:testOnly="false" android:enabled="true" android:allowBackup="true" android:theme="@android:style/Theme.NoTitleBar">
     
     
         <activity android:name=".MainActivity"
-                  android:label="@string/app_name">
+                  android:label="@string/app_name"
+                  android:screenOrientation="portrait"
+                  android:windowSoftInputMode="stateHidden">
+                  
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 		<activity android:name=".UsageActivity"
-                  android:label="@string/app_name">
+                  android:label="@string/app_name"
+                  android:screenOrientation="portrait">
             <intent-filter>
 
             </intent-filter>

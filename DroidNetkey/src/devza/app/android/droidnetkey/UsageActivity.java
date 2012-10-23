@@ -18,6 +18,9 @@
 
 package devza.app.android.droidnetkey;
 
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.Timer;
@@ -28,9 +31,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;*/
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -86,29 +91,67 @@ public class UsageActivity extends DroidnetkeyActivity{
      private InetCallback listener = new InetCallback() {
 		
 		@Override
-		public void statusCallback(int code, String message) {
+		public void statusCallback(final int code, final String message) {
 			// TODO Auto-generated method stub
 			Log.d("DNK", "Code: "+code+" : "+message);
 			d.dismiss();
 			
-			switch(code)
-			{
-				case 0:
+			runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					unbindService(s);
 					startActivity(new Intent(UsageActivity.this, MainActivity.class));
-					break;
-				default:
-					runOnUiThread(new Runnable() {
-						
-						@Override
-						public void run() {
-							// TODO Auto-generated method stub
-							Toast.makeText(UsageActivity.this, "An error has occured, please try again.", Toast.LENGTH_SHORT).show();
-						}
-					});
-					break;
-			}
+				}
+			});
 			
 		}
+
+		@Override
+		public void statusCallback(final Exception e) {
+			// TODO Auto-generated method stub
+
+			Log.d("DNK","An exception has occured", e);
+			
+			try{
+				d.dismiss();
+			}catch(Exception ex){}
+			
+			runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					Throwable cause = e.getCause();
+					String message = "";
+					if (cause instanceof UnknownHostException){
+						message = "I could not contact the Inetkey server. Try reconnecting to WiFi. Don't worry, we'll return to the login screen!";
+					} else if(cause instanceof SocketTimeoutException){
+						message = "The connection to the Inetkey server timed out. Don't worry, we'll return to the login screen!";
+					} else if(cause instanceof SocketException){
+						message = "Something bad happened, I am not sure what. Make sure you are connected to WiFi. Don't worry, we'll return to the login screen!";
+					} else {
+						message = "Yep, this is one of those unknown errors ಠ_ಠ. Don't worry, we'll return to the login screen!";
+					}
+					
+					AlertDialog error = new AlertDialog.Builder(UsageActivity.this).create();
+					error.setTitle("Error");
+					error.setButton("Ok", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface d, int id)
+						{
+							unbindService(s);
+							startActivity(new Intent(UsageActivity.this, MainActivity.class));
+						}
+					});
+						
+					error.setMessage(message);
+					error.show();
+				}
+					
+					
+			});
+		}
+
 	};
     
     private void update()
@@ -122,6 +165,7 @@ public class UsageActivity extends DroidnetkeyActivity{
 				if(cService == null)
 				{
 					Log.d("DNK","Service tried update without service being bound" );
+					return;
 				}
 				Map<String, Object> api_stat = cService.getApi_stat();
 				
@@ -129,6 +173,8 @@ public class UsageActivity extends DroidnetkeyActivity{
 				
 				//Log.d("test", df.format(((Number)api_stat.get("monthusage")).doubleValue()));
 				
+				((TextView)findViewById(R.id.textUsername)).setText((String) api_stat.get("username"));
+		    	((TextView)findViewById(R.id.textUserState)).setText((String) api_stat.get("state"));
 				((TextView)findViewById(R.id.textMonthUsage)).setText("R "+df.format(((Number)api_stat.get("monthusage")).doubleValue()));
 		    	((TextView)findViewById(R.id.textYearUsage)).setText("R "+df.format(((Number)api_stat.get("yearusage")).doubleValue()));
 		    	
@@ -177,7 +223,7 @@ public class UsageActivity extends DroidnetkeyActivity{
     public void disconnectFirewall(View view)
     {
     	d = new ProgressDialog(this);
-    	d.setCancelable(true);
+    	d.setCancelable(false);
     	d.setIndeterminate(true);
     	d.setMessage("Disconnecting...");
     	
@@ -194,17 +240,26 @@ public class UsageActivity extends DroidnetkeyActivity{
     @Override
     public void onBackPressed() {
     	//unbindService(mConnection);
-    	updateTimer.cancel();
-    	unbindService(s);
-    	moveTaskToBack (true);
+    	try{
+	    	updateTimer.cancel();
+	    	unbindService(s);
+	    	moveTaskToBack (true);
+    	}catch (Exception e) {}
     	//this.finish();
     } 
     
     @Override
     public void onDestroy()
     {
-    	super.onDestroy();
-    	unbindService(s);
-    	updateTimer.cancel();
+    	try{
+	    	super.onDestroy();
+	    	unbindService(s);
+	    	updateTimer.cancel();
+	    	if(d!=null)
+	    		if(d.isShowing()){
+	    		d.dismiss();
+	    		d = null;
+	    	}
+    	}catch (Exception e) {}
     }
 }

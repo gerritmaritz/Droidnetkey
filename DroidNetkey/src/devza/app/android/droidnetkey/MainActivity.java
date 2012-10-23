@@ -18,6 +18,10 @@
 
 package devza.app.android.droidnetkey;
 
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -55,9 +59,6 @@ public class MainActivity extends DroidnetkeyActivity {
 	
 	private ProgressDialog d;
 	
-	private final int INVALID_CREDENTIALS = 10000;
-	private final int NO_HOST = -3;
-	
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -90,10 +91,9 @@ public class MainActivity extends DroidnetkeyActivity {
 			@Override
 			public void statusCallback(final int code, final String message) {
 				// TODO Auto-generated method stub
-				d.dismiss();
-				
-				//if(code == 0)
-				//{
+				try{
+					d.dismiss();
+				}catch(Exception ex){}
 				
 				runOnUiThread(new Runnable() {
 					
@@ -116,25 +116,53 @@ public class MainActivity extends DroidnetkeyActivity {
 								}
 							});
 							
-							String msg;
-							
-							switch(code)
-							{
-								case INVALID_CREDENTIALS: 	msg = "Invalid Username or Password"+message; break;
-								default: 					msg = "Connection Error.\n"+message; break;
-							}
-							
-							error.setMessage(msg);
+							error.setMessage(message);
 							error.show();
-						}
-						
-						
+						}		
 					}
 				});
+			}
+
+			@Override
+			public void statusCallback(final Exception e) {
+
+				Log.d("DNK","An exception has occured", e);
+				try{
+					d.dismiss();
+				}catch(Exception ex){}
 				
-				
+				runOnUiThread(new Runnable() {
 					
-				//}
+					@Override
+					public void run() {
+						Throwable cause = e.getCause();
+						String message = "";
+						if (cause instanceof UnknownHostException){
+							message = "I could not contact the Inetkey server. Try reconnecting to WiFi.";
+						} else if(cause instanceof SocketTimeoutException){
+							message = "The connection to the Inetkey server timed out.";
+						} else if(cause instanceof SocketException){
+							message = "Something bad happened, I am not sure what. Make sure you are connected to WiFi.";
+						} else {
+							message = "Yep, this is one of those unknown errors.";
+						}
+						
+						AlertDialog error = new AlertDialog.Builder(MainActivity.this).create();
+						error.setTitle("Error");
+						error.setButton("Ok", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface d, int id)
+							{
+								d.cancel();
+							}
+						});
+							
+						error.setMessage(message);
+						error.show();
+					}
+						
+						
+				});
+				
 			}
 		};
     }
@@ -150,9 +178,7 @@ public class MainActivity extends DroidnetkeyActivity {
               // As our service is in the same process, this should never be called
           }
      };
-     
-     
-    
+         
     public void openFirewall(View view)
     {
     	username = editUsername.getText().toString();	
@@ -172,7 +198,7 @@ public class MainActivity extends DroidnetkeyActivity {
     	d = new ProgressDialog(this);
     	d.setCancelable(false);
     	d.setIndeterminate(true);
-    	d.setMessage("Loging in...");
+    	d.setMessage("Logging in...");
     	
     	try {
 			d.show();
@@ -256,5 +282,19 @@ public class MainActivity extends DroidnetkeyActivity {
     public void onBackPressed() {
     	
     	moveTaskToBack (true);
+    }
+    
+    @Override
+    public void onDestroy()
+    {
+    	try{
+	    	super.onDestroy();
+	    	unbindService(s);
+	    	if(d!=null)
+	    		if(d.isShowing()){
+	    		d.dismiss();
+	    		d = null;
+	    	}
+    	}catch (Exception e) {}
     }
 }

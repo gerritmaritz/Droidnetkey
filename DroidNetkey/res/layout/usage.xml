@@ -1,18 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
-
+        android:layout_height="wrap_content">
     <LinearLayout
+        
         android:id="@+id/linearLayout4"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginTop="4dp"
+            android:gravity="center_horizontal"
+            android:text="@string/acstat"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <LinearLayout
+            android:id="@+id/linearLayoutUser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="4dp" >
+
+            <TextView
+                android:id="@+id/textUser"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:keepScreenOn="true"
+                android:text="@string/un_u"
+                android:textAppearance="?android:attr/textAppearanceMedium" >
+                
+            </TextView>
+
+            <TextView
+                android:id="@+id/textUsername"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_weight="1"
+                android:keepScreenOn="true"
+                android:text="@string/default_updating"
+                android:textAppearance="?android:attr/textAppearanceLarge" >
+            </TextView>
+        </LinearLayout>
+        
+        <LinearLayout
+            android:id="@+id/linearLayoutState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="4dp" >
+
+            <TextView
+                android:id="@+id/textViewState"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:keepScreenOn="true"
+                android:text="@string/acc_state"
+                android:textAppearance="?android:attr/textAppearanceMedium" >
+            </TextView>
+
+            <TextView
+                android:id="@+id/textUserState"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_weight="1"
+                android:keepScreenOn="true"
+                android:text="@string/default_updating"
+                android:textAppearance="?android:attr/textAppearanceLarge" >
+            </TextView>
+        </LinearLayout>
+        
         <LinearLayout
             android:id="@+id/linearLayout1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="4dp" >
 
             <TextView
                 android:id="@+id/textView1"
@@ -21,7 +101,8 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:keepScreenOn="true"
-                android:text="Month Usage:" >
+                android:text="@string/mon_usage"
+                android:textAppearance="?android:attr/textAppearanceMedium" >
             </TextView>
 
             <TextView
@@ -31,7 +112,7 @@
                 android:layout_gravity="left"
                 android:layout_weight="1"
                 android:keepScreenOn="true"
-                android:text="Updating..."
+                android:text="@string/default_updating"
                 android:textAppearance="?android:attr/textAppearanceLarge" >
             </TextView>
         </LinearLayout>
@@ -39,14 +120,19 @@
         <LinearLayout
             android:id="@+id/linearLayout2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="4dp" >
 
             <TextView
                 android:id="@+id/textView3"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Year Usage:" >
+                android:text="@string/year_usage"
+                android:textAppearance="?android:attr/textAppearanceMedium" >
             </TextView>
 
             <TextView
@@ -55,41 +141,51 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:keepScreenOn="true"
-                android:text="Updating..."
+                android:text="@string/default_updating"
                 android:textAppearance="?android:attr/textAppearanceLarge" >
             </TextView>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="4dp" >
 
             <TextView
                 android:id="@+id/textView5"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Internet State:" />
+                android:text="@string/istate"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
                 android:id="@+id/textInetState"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Updating..."
+                android:text="@string/default_updating"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="4dp" >
 
             <TextView
                 android:id="@+id/textInetMessage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:text="" />
+                android:text=""
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
         </LinearLayout>
 
@@ -97,29 +193,11 @@
             android:id="@+id/button1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"
             android:onClick="disconnectFirewall"
-            android:text="Disconnect" />
+            android:text="@string/discon" />
 
     </LinearLayout>
-
-    <RelativeLayout
-        android:id="@+id/relativeLayout1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true" 
-        android:onClick="showMenu">
-
-        <ImageView
-            android:id="@+id/imageView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/triangle" 
-            />
-    </RelativeLayout>
-
-</RelativeLayout>
+    </ScrollView>

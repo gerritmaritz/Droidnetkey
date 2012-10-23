@@ -34,8 +34,6 @@ import android.widget.EditText;
 
 public class DroidnetkeyActivity extends Activity {
 	
-	private InetCallback listener;
-	
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -50,7 +48,7 @@ public class DroidnetkeyActivity extends Activity {
     	String msg = "";
         switch (item.getItemId()) {
             case R.id.help:     popup.setTitle("Help");
-                                msg = "Inetkey for Android allows you to open the firewall of Stellenbosch University from you mobile device to gain internet access. Simply enter you SU username and password and click Connect. Passwords are encrypted on the device to ensure security. This application will only work if connected to a SU WiFi network. Remember that to connect to a SU WiFi network, your device needs to be registered.";
+                                msg = "Inetkey for Android allows you to open the firewall of Stellenbosch University from your mobile device to gain internet access. Simply enter your SU username and password and connect. Passwords are encrypted on the device to ensure security. This application will only work if connected to a SU WiFi network. Remember that to connect to a SU WiFi network, your device needs to be registered.";
                                 break;
             case R.id.about:    popup.setTitle("About");
             					msg = "Inetkey for Android \nCopyright \251 2012 \nGerrit N. Maritz \n\nThis program comes with ABSOLUTELY NO WARRANTY. This program is released under the GPLv3 licence. \n\nIcon: David Vignoni";
@@ -97,10 +95,10 @@ public class DroidnetkeyActivity extends Activity {
 	    return false;
 	}
     
-    public void showMenu(View view)
+    /*public void showMenu(View view)
     {
     	this.getWindow().openPanel(Window.FEATURE_OPTIONS_PANEL, new KeyEvent 
 				(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MENU));
-    }
+    }*/
 	
 }
